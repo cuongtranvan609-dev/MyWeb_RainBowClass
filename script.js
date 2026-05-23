@@ -52,11 +52,55 @@ const MENUS = {
    HELPERS
 ---------------------------------------------------------- */
 async function apiFetch(url, options = {}) {
-  const res = await fetch(url, {
-    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
-    ...options,
-  });
-  return res.json();
+  console.log('Mock API call:', url, options);
+  await new Promise(r => setTimeout(r, 200)); // Giả lập mạng
+  
+  if (url.includes('auth.php')) {
+    const body = options.body ? JSON.parse(options.body) : {};
+    if (body.action === 'login') {
+      let role = 'student';
+      if (body.email.includes('admin')) role = 'admin';
+      if (body.email.includes('teacher')) role = 'teacher';
+      if (body.email.includes('parent')) role = 'parent';
+      return { success: true, user: { id: 1, name: 'Demo ' + role, email: body.email, role: role, phone: '0987654321', address: 'Hà Nội' } };
+    }
+    return { success: true };
+  }
+  
+  if (url.includes('users.php')) {
+    if (options.method === 'DELETE') return { success: true };
+    return { success: true, users: [
+      { id: 1, name: 'Admin Demo', email: 'admin@rainbow.vn', role: 'admin', status: 'active' },
+      { id: 2, name: 'Giáo viên Demo', email: 'teacher@rainbow.vn', role: 'teacher', status: 'active' },
+      { id: 3, name: 'Học sinh Demo', email: 'student@rainbow.vn', role: 'student', status: 'active' },
+      { id: 4, name: 'Phụ huynh Demo', email: 'parent@rainbow.vn', role: 'parent', status: 'active' }
+    ]};
+  }
+  
+  if (url.includes('classes.php')) {
+    if (options.method === 'DELETE') return { success: true };
+    return { success: true, classes: [
+      { id: 1, name: 'Toán Cơ bản 10', subject: 'Toán', level: 'THPT', teacher_name: 'Nguyễn Văn A', schedule: 'T2, T4 (18:00)', enrolled: 12, total_slots: 20, location: 'Online' },
+      { id: 2, name: 'Anh văn Giao tiếp', subject: 'Anh văn', level: 'THPT', teacher_name: 'Trần Thị B', schedule: 'T3, T5 (19:30)', enrolled: 15, total_slots: 15, location: 'Online' },
+      { id: 3, name: 'Ngữ văn 9 Luyện thi', subject: 'Văn', level: 'THCS', teacher_name: 'Lê Văn C', schedule: 'T7, CN (14:00)', enrolled: 8, total_slots: 15, location: 'Online' },
+      { id: 4, name: 'Toán Nâng cao 12', subject: 'Toán', level: 'THPT', teacher_name: 'Giáo viên Demo', schedule: 'T2, T6 (19:00)', enrolled: 18, total_slots: 25, location: 'Cơ sở 1' }
+    ]};
+  }
+  
+  if (url.includes('applications.php')) {
+    if (options.method === 'PUT') return { success: true };
+    return { success: true, applications: [
+      { id: 1, name: 'Phạm Thị D', email: 'phamd@gmail.com', subject: 'Vật lý', status: 'pending', created_at: new Date().toISOString() },
+      { id: 2, name: 'Hoàng Văn E', email: 'hoange@gmail.com', subject: 'Hóa học', status: 'interview', interview_date: new Date().toISOString().split('T')[0], interview_time: '14:00', created_at: new Date().toISOString() }
+    ]};
+  }
+  
+  if (url.includes('enrollments.php')) return { success: true, classes: [] };
+  if (url.includes('requests.php') || url.includes('teachers.php') || url.includes('payments.php') || url.includes('tuition.php') || url.includes('attendance.php')) {
+    return { success: true, data: [], history: [], results: [] };
+  }
+
+  return { success: true };
 }
 
 function fmtDate(dateStr) {
