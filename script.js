@@ -1311,3 +1311,28 @@ function switchGuideTab(tab) {
 
   renderPublicClasses();
 })();
+
+// ============================================================
+// MOBILE MENU TOGGLE
+// ============================================================
+const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+const navLinks = document.getElementById('navLinks');
+const navActions = document.getElementById('navActions');
+
+if (mobileMenuBtn) {
+  mobileMenuBtn.addEventListener('click', () => {
+    navLinks.classList.toggle('show');
+    navActions.classList.toggle('show');
+  });
+}
+
+// Hide menu when a nav link is clicked
+const allNavLinks = document.querySelectorAll('.nav-link');
+allNavLinks.forEach(link => {
+  link.addEventListener('click', () => {
+    if (window.innerWidth <= 768) {
+      navLinks.classList.remove('show');
+      navActions.classList.remove('show');
+    }
+  });
+});
